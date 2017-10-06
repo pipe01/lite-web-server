@@ -1,0 +1,4 @@
+[submodule "lib/CliWrap"]
+	path = lib/CliWrap
+	url = https://github.com/Tyrrrz/CliWrap.git
+	branch = master

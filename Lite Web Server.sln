@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lite Web Server", "Lite Web
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PHP Scripting", "PHP Scripting\PHP Scripting.csproj", "{0C332FAB-35C0-4025-95C3-AF45E2289653}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliWrap", "lib\CliWrap\CliWrap\CliWrap.csproj", "{19D58D20-A029-403F-9077-732B5DEEC470}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0C332FAB-35C0-4025-95C3-AF45E2289653}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C332FAB-35C0-4025-95C3-AF45E2289653}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C332FAB-35C0-4025-95C3-AF45E2289653}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19D58D20-A029-403F-9077-732B5DEEC470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19D58D20-A029-403F-9077-732B5DEEC470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19D58D20-A029-403F-9077-732B5DEEC470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19D58D20-A029-403F-9077-732B5DEEC470}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
