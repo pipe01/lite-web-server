@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using CliWrap;
 
 namespace PHP_Scripting
 {
@@ -42,7 +43,16 @@ namespace PHP_Scripting
 
             string filePath = Path.GetFullPath(file);
 
-            ProcessStartInfo psi = new ProcessStartInfo();
+            var cli = new Cli(_Installation.PhpExecutablePath);
+
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(TimeSpan.FromSeconds(_Installation.ExecutionTimeout));
+
+            var output = cli.Execute($"-f \"{filePath}\"", cts.Token);
+
+            return output.StandardOutput;
+
+            /*ProcessStartInfo psi = new ProcessStartInfo();
             psi.FileName = _Installation.PhpExecutablePath;
             psi.Arguments = $"-f \"{filePath}\"";
             //psi.EnvironmentVariables.Add("")
@@ -54,11 +64,11 @@ namespace PHP_Scripting
             
             p.Start();
 
-            /*Task.Delay(_Installation.ExecutionTimeout).ContinueWith((t) =>
+            Task.Delay(_Installation.ExecutionTimeout).ContinueWith((t) =>
             {
                 if (!p.HasExited)
                     p.Kill();
-            });*/
+            });
             
             while (!p.StandardOutput.EndOfStream)
             {
@@ -66,7 +76,7 @@ namespace PHP_Scripting
                 ret.AppendLine(line);
             }
 
-            return ret.ToString();
+            return ret.ToString();*/
         }
     }
 }

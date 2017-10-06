@@ -62,16 +62,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\CliWrap\CliWrap\CliWrap.csproj">
-      <Project>{19d58d20-a029-403f-9077-732b5deec470}</Project>
-      <Name>CliWrap</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CliWrap\CliWrap\CliWrap.csproj">
+      <Project>{c555b092-f639-487a-b90f-5e308cb952b2}</Project>
+      <Name>CliWrap</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.2.0.0\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.2.0.0\build\dotnet\Fody.targets')" />

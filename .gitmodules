@@ -2,3 +2,7 @@
 	path = lib/CliWrap
 	url = https://github.com/Tyrrrz/CliWrap.git
 	branch = master
+[submodule "CliWrap"]
+	path = CliWrap
+	url = https://github.com/pipe01/CliWrap.git
+	branch = master
