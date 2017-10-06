@@ -10,17 +10,21 @@ namespace Lite_Web_Server.File_Processors
 {
     public class PHP : FileProcessor
     {
-        private PhpInstallation _Installation;
+        private static PhpInstallation _Installation;
 
         public PHP(Configuration config) : base(config)
         {
-            if (config.TryGet("CustomPhpPath", out string path))
+            if (_Installation == null)
             {
-                _Installation = new PhpInstallation(path);
-            }
-            else
-            {
-                _Installation = new PhpInstallation(Program.GetPhpVersion(config));
+                if (config.TryGet("CustomPhpPath", out string path))
+                {
+                    _Installation = new PhpInstallation(path);
+                }
+                else
+                {
+                    _Installation = new PhpInstallation(Program.GetPhpVersion(config));
+                }
+                _Installation.ExecutionTimeout = config.Get("PhpExecutionTimeout", 4);
             }
         }
 

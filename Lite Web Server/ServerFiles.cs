@@ -12,15 +12,37 @@ namespace Lite_Web_Server
 {
     public struct ServerFile
     {
+        /// <summary>
+        /// File name and extension
+        /// </summary>
         public string FileName;
+
+        /// <summary>
+        /// Path relative to server root, not including file name
+        /// </summary>
         public string RelativePath;
+
+        /// <summary>
+        /// Path relative to computer file system, including file name
+        /// </summary>
         public string FileSystemPath;
+
+        /// <summary>
+        /// Whether this file is a folder
+        /// </summary>
         public bool IsFolder;
         
         public string FullServerPath => Path.Combine(RelativePath, FileName) + (IsFolder ? "/" : "");
         public string MimeType => Mime.GetMimeType(Path.GetExtension(FileName));
         public string Extension => Path.GetExtension(FileName);
 
+        /// <summary>
+        /// Create new ServerFile
+        /// </summary>
+        /// <param name="fileName">File name with extension</param>
+        /// <param name="relativePath">File path relative to server root without extension</param>
+        /// <param name="isFolder">Is this a folder?</param>
+        /// <param name="FileSystemPath">Full computer file system path</param>
         public ServerFile(string fileName, string relativePath, bool isFolder, string FileSystemPath)
         {
             this.FileName = fileName;
@@ -34,14 +56,21 @@ namespace Lite_Web_Server
     {
         private List<ServerFile> _InnerList = new List<ServerFile>();
 
+        /// <summary>
+        /// List of valid extensions for default index page
+        /// </summary>
         public string[] ValidIndexExtensions { get; set; } = { "html", "htm", "php" };
+
+        /// <summary>
+        /// Server content root
+        /// </summary>
         public string FilesRoot { get; set; } = "./";
         
         public ServerFile this[int index] => _InnerList[index];
         public int Count => _InnerList.Count;
         public IEnumerator<ServerFile> GetEnumerator() => _InnerList.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _InnerList.GetEnumerator();
-
+        
         public void LoadFromDirectory()
         {
             string root = Path.GetFullPath(FilesRoot);
@@ -118,20 +147,29 @@ namespace Lite_Web_Server
         }
         public ServerFile? SearchFile(string filename, string root)
         {
-            LoadFromDirectory();
+            //The root is just "/", so make it empty
+            if (root == "/")
+                root = "";
 
-            if (!root.EndsWith("/"))
-                root += "/";
+            //Remove "/" from the start of the root
+            root = root.TrimStart('/', '\\');
 
-            foreach (var item in _InnerList)
+            //Get the full path of the server's file root
+            var fullFileRoot = Path.GetFullPath(FilesRoot);
+
+            //Combine the relative file path and the full file root
+            var combinedPath = Path.Combine(fullFileRoot, root, filename);
+
+            //Check if it exists
+            var fileExists = File.Exists(combinedPath);
+            
+            //If it exists, return it
+            if (fileExists)
             {
-                if (item.RelativePath.Equals(root, StringComparison.InvariantCultureIgnoreCase) &&
-                    Regex.IsMatch(item.FileName, WildCardToRegular(filename)))
-                {
-                    return item;
-                }
+                return new ServerFile(filename, root + filename, false, combinedPath);
             }
-            return new ServerFile?();
+
+            return null;
         }
 
         private static String WildCardToRegular(String value)

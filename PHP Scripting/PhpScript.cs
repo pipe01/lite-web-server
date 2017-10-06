@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using CliWrap;
+using CliWrap.Models;
 
 namespace PHP_Scripting
 {
@@ -45,10 +46,12 @@ namespace PHP_Scripting
 
             var cli = new Cli(_Installation.PhpExecutablePath);
 
+            var execInput = new ExecutionInput($"-f \"{filePath}\"");
+
             var cts = new CancellationTokenSource();
             cts.CancelAfter(TimeSpan.FromSeconds(_Installation.ExecutionTimeout));
-
-            var output = cli.Execute($"-f \"{filePath}\"", cts.Token);
+            
+            var output = cli.Execute(execInput, cts.Token);
 
             return output.StandardOutput;
 
