@@ -1,4 +1,5 @@
-﻿using PHP_Scripting;
+﻿using CliWrap;
+using PHP_Scripting;
 using PHP_Scripting.Install;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace Lite_Web_Server
         {
             Configuration config = new Configuration();
             config.Load();
-
+            
             PhpVersions = Installer.AvailableVersions;
             PhpVersions.Sort((a, b) => a.VersionNumber.CompareTo(b.VersionNumber));
 

@@ -13,9 +13,15 @@ namespace Lite_Web_Server
     public class Configuration : IEnumerable<KeyValuePair<string, object>>
     {
         private Dictionary<string, object> _Entries = new Dictionary<string, object>();
+        private bool _InMemory;
         private const string KeyValueSeparator = "=";
         
         public string FilePath { get; set; } = "config.cfg";
+
+        public Configuration(bool inMemory = false)
+        {
+            _InMemory = inMemory;
+        }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
@@ -63,6 +69,9 @@ namespace Lite_Web_Server
 
         public void Save(string path = null)
         {
+            if (_InMemory)
+                return;
+
             path = path ?? FilePath;
 
             List<string> lines = new List<string>();

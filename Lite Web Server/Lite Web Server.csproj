@@ -70,6 +70,10 @@
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CliWrap\CliWrap\CliWrap.csproj">
+      <Project>{C555B092-F639-487A-B90F-5E308CB952B2}</Project>
+      <Name>CliWrap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PHP Scripting\PHP Scripting.csproj">
       <Project>{0C332FAB-35C0-4025-95C3-AF45E2289653}</Project>
       <Name>PHP Scripting</Name>

@@ -2,6 +2,7 @@
 using PHP_Scripting.Install;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -143,6 +144,8 @@ namespace Lite_Web_Server
 
         private void ReceiveCallback(IAsyncResult ar)
         {
+            Stopwatch stopWatch = Stopwatch.StartNew();
+
             var state = (NetworkState)ar.AsyncState;
             var client = state.RemoteClient;
 
@@ -162,13 +165,15 @@ namespace Lite_Web_Server
                     HttpRequest req = RequestParser.Parse(str);
                     HttpResponse resp = ParseRequest(req);
 
-                    SendResponse(client, req, resp);
+                    SendResponse(client, req, resp, stopWatch.Elapsed);
                 }
             }
             else
             {
                 throw new Exception("Something went wrong. Error code: " + error);
             }
+
+            stopWatch.Stop();
         }
 
         private HttpResponse ParseRequest(HttpRequest req)
@@ -229,12 +234,14 @@ namespace Lite_Web_Server
             return response;
         }
 
-        private void SendResponse(TcpClient client, HttpRequest request, HttpResponse response)
+        private void SendResponse(TcpClient client, HttpRequest request,
+            HttpResponse response, TimeSpan timeElapsed)
         {
             string logLine =
                 DateTime.Now.ToString(@"\[yyyy\-MM\-dd hh\:mm\:ss\]") +
                 $" {request.RemoteHost}: {request.Method} {request.HostPath} " +
-                $"({(int)response.StatusCode} {response.StatusName})";
+                $"({(int)response.StatusCode} {response.StatusName}) in" +
+                $" {timeElapsed.TotalSeconds.ToString("0.0")} seconds";
             Log.WriteLine(logLine);
 
             client.Client.Send(Encoding.UTF8.GetBytes(response.ToString()));

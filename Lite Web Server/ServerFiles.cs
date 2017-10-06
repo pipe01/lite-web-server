@@ -13,28 +13,17 @@ namespace Lite_Web_Server
     public struct ServerFile
     {
         /// <summary>
-        /// File name and extension
+        /// File path relative to server root
         /// </summary>
-        public string FileName;
+        public string FilePath;
 
         /// <summary>
-        /// Path relative to server root, not including file name
+        /// File path relative to PC
         /// </summary>
-        public string RelativePath;
+        public string AbsoluteFilePath;
 
-        /// <summary>
-        /// Path relative to computer file system, including file name
-        /// </summary>
-        public string FileSystemPath;
-
-        /// <summary>
-        /// Whether this file is a folder
-        /// </summary>
-        public bool IsFolder;
-        
-        public string FullServerPath => Path.Combine(RelativePath, FileName) + (IsFolder ? "/" : "");
-        public string MimeType => Mime.GetMimeType(Path.GetExtension(FileName));
-        public string Extension => Path.GetExtension(FileName);
+        public string MimeType => Mime.GetMimeType(this.Extension);
+        public string Extension => Path.GetExtension(FilePath);
 
         /// <summary>
         /// Create new ServerFile
@@ -43,12 +32,10 @@ namespace Lite_Web_Server
         /// <param name="relativePath">File path relative to server root without extension</param>
         /// <param name="isFolder">Is this a folder?</param>
         /// <param name="FileSystemPath">Full computer file system path</param>
-        public ServerFile(string fileName, string relativePath, bool isFolder, string FileSystemPath)
+        public ServerFile(string serverFilePath, string pcFilePath)
         {
-            this.FileName = fileName;
-            this.RelativePath = relativePath;
-            this.IsFolder = isFolder;
-            this.FileSystemPath = FileSystemPath;
+            this.FilePath = serverFilePath;
+            this.AbsoluteFilePath = pcFilePath;
         }
     }
 
@@ -68,30 +55,34 @@ namespace Lite_Web_Server
         
         public string ReadAllText(ServerFile file)
         {
-            return File.ReadAllText(GetLocalFilePath(file));
+            return File.ReadAllText(GetFullPathForServerFile(file.FilePath));
         }
-
-        public string GetLocalFilePath(ServerFile file)
-        {
-            return Path.Combine(Path.GetFullPath(FilesRoot), file.RelativePath.TrimStart('/'), file.FileName);
-        }
-
+        
         public ServerFile? SearchFile(string fullPath)
         {
+            //Get the path file name
             string fileName = Path.GetFileName(fullPath);
+
+            //Try to get the directory path for the file path
             string filePath = Path.GetDirectoryName(fullPath)?.Replace('\\', '/');
+
+            //If it's null (the file is on the root), make it a "/"
             filePath = filePath ?? "/";
 
-            bool isFolder = _InnerList.Any(o => o.IsFolder && o.FileName == fileName && o.RelativePath == filePath);
+            //Check if it's a folder
+            bool isFolder = Directory.Exists(GetFullPathForServerFile(fullPath));
 
             if (isFolder)
             {
+                //If it's a folder, append a "/" to the file path and make the file name empty
                 filePath += fileName + "/";
                 fileName = "";
             }
 
-            if (fileName == "") //Search for index.html etc
+            //It's a folder, the file name is empty
+            if (fileName == "")
             {
+                //Search for valid index files
                 foreach (var item in ValidIndexExtensions)
                 {
                     var file = SearchFile("index." + item, filePath);
@@ -101,7 +92,7 @@ namespace Lite_Web_Server
                 }
                 return null;
             }
-            else
+            else //It's a file, search it
             {
                 return SearchFile(fileName, filePath);
             }
@@ -112,25 +103,24 @@ namespace Lite_Web_Server
             if (root == "/")
                 root = "";
 
-            //Remove "/" from the start of the root
-            root = root.TrimStart('/', '\\');
-
-            //Get the full path of the server's file root
-            var fullFileRoot = Path.GetFullPath(FilesRoot);
-
-            //Combine the relative file path and the full file root
-            var combinedPath = Path.Combine(fullFileRoot, root, filename);
+            //Get file system path for server file
+            var filePath = GetFullPathForServerFile(root + "/" + filename);
 
             //Check if it exists
-            var fileExists = File.Exists(combinedPath);
+            var fileExists = File.Exists(filePath);
             
             //If it exists, return it
             if (fileExists)
             {
-                return new ServerFile(filename, root + filename, false, combinedPath);
+                return new ServerFile(Path.Combine(root, filename), filePath);
             }
 
             return null;
+        }
+
+        private string GetFullPathForServerFile(string serverFilePath)
+        {
+            return Path.Combine(Path.GetFullPath(FilesRoot), serverFilePath.TrimStart('/', '\\'));
         }
     }
 }
