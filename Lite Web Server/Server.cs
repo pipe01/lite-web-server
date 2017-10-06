@@ -89,9 +89,7 @@ namespace Lite_Web_Server
         {
             _Listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Port);
             _Listener.Start();
-
-            _Files.LoadFromDirectory();
-
+            
             Console.WriteLine("Listening on port " + Port);
 
 #pragma warning disable 4014

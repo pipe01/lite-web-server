@@ -52,7 +52,7 @@ namespace Lite_Web_Server
         }
     }
 
-    public class ServerFiles : IReadOnlyList<ServerFile>
+    public class ServerFiles
     {
         private List<ServerFile> _InnerList = new List<ServerFile>();
 
@@ -66,45 +66,6 @@ namespace Lite_Web_Server
         /// </summary>
         public string FilesRoot { get; set; } = "./";
         
-        public ServerFile this[int index] => _InnerList[index];
-        public int Count => _InnerList.Count;
-        public IEnumerator<ServerFile> GetEnumerator() => _InnerList.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => _InnerList.GetEnumerator();
-        
-        public void LoadFromDirectory()
-        {
-            string root = Path.GetFullPath(FilesRoot);
-
-            _InnerList.Clear();
-
-            //Get all files
-            foreach (var item in Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories))
-            {
-                string fileName = Path.GetFileName(item);
-                string relative = ToRelativePath(item, root);
-                string fileFolder = Path.GetDirectoryName(relative)?.Replace('\\', '/');
-
-                fileFolder = fileFolder ?? "/";
-
-                if (fileFolder.Last() != '/')
-                    fileFolder += "/";
-
-                _InnerList.Add(new ServerFile(fileName, fileFolder, false, item));
-            }
-
-            //Get all folders
-            foreach (var item in Directory.EnumerateDirectories(root, "*", SearchOption.AllDirectories))
-            {
-                string fileName = Path.GetFileName(item);
-                string fileFolder = Path.GetDirectoryName(ToRelativePath(item, root))?.Replace('\\', '/');
-
-                if (fileFolder == null)
-                    continue;
-
-                _InnerList.Add(new ServerFile(fileName, fileFolder, true, item));
-            }
-        }
-
         public string ReadAllText(ServerFile file)
         {
             return File.ReadAllText(GetLocalFilePath(file));
@@ -170,16 +131,6 @@ namespace Lite_Web_Server
             }
 
             return null;
-        }
-
-        private static String WildCardToRegular(String value)
-        {
-            return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + "$";
-        }
-
-        private static string ToRelativePath(string path, string rootPath)
-        {
-            return path.Replace(rootPath, "").Replace('\\', '/');
         }
     }
 }
